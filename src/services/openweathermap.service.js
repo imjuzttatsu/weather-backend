@@ -8,6 +8,10 @@ const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org';
 
 export async function searchLocation(query) {
   try {
+    if (!OPENWEATHER_API_KEY) {
+      return { error: 'OPENWEATHER_API_KEY is not configured' };
+    }
+
     const url = `${OPENWEATHER_BASE_URL}/geo/1.0/direct`;
     
     const response = await axios.get(url, {
@@ -19,7 +23,7 @@ export async function searchLocation(query) {
     });
 
     if (!response.data || response.data.length === 0) {
-      return { error: 'Không tìm thấy địa điểm' };
+      return { error: 'khong tim thay dia diem' };
     }
 
     const results = response.data.map(location => ({
@@ -34,8 +38,12 @@ export async function searchLocation(query) {
 
     return results;
   } catch (error) {
-    console.error('OpenWeatherMap Geocoding Error:', error.message);
-    throw new Error('Lỗi khi tìm kiếm địa điểm');
+    console.error('openweathermap geocoding error:', error.message);
+    if (error.response) {
+      console.error('response status:', error.response.status);
+      console.error('response data:', error.response.data);
+    }
+    return { error: 'loi khi tim kiem dia diem', details: error.message };
   }
 }
 
@@ -101,7 +109,11 @@ export async function reverseGeocode(lat, lon) {
         };
       }
     } catch (nominatimError) {
-      console.log('Nominatim error, falling back to OpenWeatherMap:', nominatimError.message);
+      console.log('nominatim error, falling back to openweathermap:', nominatimError.message);
+    }
+
+    if (!OPENWEATHER_API_KEY) {
+      return { error: 'OPENWEATHER_API_KEY is not configured' };
     }
 
     const url = `${OPENWEATHER_BASE_URL}/geo/1.0/reverse`;
@@ -116,7 +128,7 @@ export async function reverseGeocode(lat, lon) {
     });
 
     if (!response.data || response.data.length === 0) {
-      return { error: 'Không tìm thấy địa điểm' };
+      return { error: 'khong tim thay dia diem' };
     }
 
     const location = response.data[0];
@@ -131,8 +143,8 @@ export async function reverseGeocode(lat, lon) {
       placeType: 'place'
     };
   } catch (error) {
-    console.error('Reverse Geocoding Error:', error.message);
-    throw new Error('Lỗi khi tìm địa điểm');
+    console.error('reverse geocoding error:', error.message);
+    return { error: 'loi khi tim dia diem', details: error.message };
   }
 }
 

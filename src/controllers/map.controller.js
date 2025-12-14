@@ -25,13 +25,17 @@ export async function searchLocation(req, res) {
     const { q } = req.query;
     
     if (!q) {
-      return res.status(400).json({ error: 'Cần cung cấp query string (q)' });
+      return res.status(400).json({ error: 'can cung cap query string (q)' });
     }
     
     const results = await openweathermapService.searchLocation(q);
     
     if (results.error) {
       return res.status(404).json(results);
+    }
+    
+    if (!Array.isArray(results)) {
+      return res.status(500).json({ error: 'loi khi tim kiem dia diem' });
     }
     
     res.json({
@@ -41,8 +45,8 @@ export async function searchLocation(req, res) {
     });
     
   } catch (error) {
-    console.error('Search Location Error:', error);
-    res.status(500).json({ error: 'Lỗi khi tìm kiếm địa điểm' });
+    console.error('search location error:', error);
+    res.status(500).json({ error: 'loi khi tim kiem dia diem' });
   }
 }
 
@@ -51,7 +55,7 @@ export async function reverseGeocode(req, res) {
     const { lat, lon } = req.query;
     
     if (!lat || !lon) {
-      return res.status(400).json({ error: 'Cần cung cấp lat và lon' });
+      return res.status(400).json({ error: 'can cung cap lat va lon' });
     }
     
     const location = await openweathermapService.reverseGeocode(
@@ -66,8 +70,8 @@ export async function reverseGeocode(req, res) {
     res.json(location);
     
   } catch (error) {
-    console.error('Reverse Geocode Error:', error);
-    res.status(500).json({ error: 'Lỗi khi tìm địa điểm' });
+    console.error('reverse geocode error:', error);
+    res.status(500).json({ error: 'loi khi tim dia diem' });
   }
 }export async function getTemperatureGrid(req, res) {
   try {

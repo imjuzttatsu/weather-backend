@@ -36,8 +36,7 @@ export async function getCurrentWeather(lat, lon) {
         'weather_code',
         'wind_speed_10m',
         'wind_direction_10m',
-        'precipitation',
-        'pressure_msl'
+        'precipitation'
       ].join(','),
       timezone: 'Asia/Bangkok' // GMT+7 cho Việt Nam
     };
@@ -63,7 +62,6 @@ export async function getCurrentWeather(lat, lon) {
     console.log(`[OPEN-METEO]   Condition: ${condition}`);
     console.log(`[OPEN-METEO]   Humidity: ${current.relative_humidity_2m}%`);
     console.log(`[OPEN-METEO]   Wind Speed: ${current.wind_speed_10m} km/h`);
-    console.log(`[OPEN-METEO]   Pressure: ${current.pressure_msl} hPa`);
     
     // Process humidity: Open-Meteo returns 0-100%, ensure it's valid and rounded
     let humidity = current.relative_humidity_2m;
@@ -83,7 +81,6 @@ export async function getCurrentWeather(lat, lon) {
       windSpeed: current.wind_speed_10m,
       windDirection: current.wind_direction_10m,
       precipitation: current.precipitation,
-      pressure: current.pressure_msl,
       time: current.time,
       condition: condition
     };
