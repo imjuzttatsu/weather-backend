@@ -53,10 +53,29 @@ export async function getCurrentWeather(req, res) {
       return res.status(400).json({ error: 'toa do khong hop le', lat, lon });
     }
     
-    const weather = await openMeteoService.getCurrentWeather(
-      parseFloat(lat), 
-      parseFloat(lon)
-    );
+    let weather;
+    try {
+      weather = await openMeteoService.getCurrentWeather(
+        parseFloat(lat), 
+        parseFloat(lon)
+      );
+    } catch (openMeteoError) {
+      if (openMeteoError.message?.includes('rate limit') || openMeteoError.message?.includes('429')) {
+        console.log(`[WEATHER] Open-Meteo rate limit, falling back to OpenWeatherMap`);
+        try {
+          weather = await openweathermapService.getCurrentWeather(
+            parseFloat(lat), 
+            parseFloat(lon)
+          );
+          console.log(`[WEATHER] Fallback to OpenWeatherMap successful`);
+        } catch (openWeatherError) {
+          console.error(`[WEATHER] OpenWeatherMap fallback failed:`, openWeatherError.message);
+          throw openMeteoError;
+        }
+      } else {
+        throw openMeteoError;
+      }
+    }
     
     if (!weather) {
       console.error(`[WEATHER] Weather data is null/undefined for ${lat}, ${lon}`);
@@ -150,11 +169,31 @@ export async function getForecast(req, res) {
       return res.status(400).json({ error: 'can cung cap city hoac lat/lon' });
     }
     
-    const forecast = await openMeteoService.getWeatherForecast(
-      parseFloat(lat),
-      parseFloat(lon),
-      parseInt(days)
-    );
+    let forecast;
+    try {
+      forecast = await openMeteoService.getWeatherForecast(
+        parseFloat(lat),
+        parseFloat(lon),
+        parseInt(days)
+      );
+    } catch (openMeteoError) {
+      if (openMeteoError.message?.includes('rate limit') || openMeteoError.message?.includes('429')) {
+        console.log(`[WEATHER] Open-Meteo rate limit, falling back to OpenWeatherMap`);
+        try {
+          forecast = await openweathermapService.getWeatherForecast(
+            parseFloat(lat),
+            parseFloat(lon),
+            parseInt(days)
+          );
+          console.log(`[WEATHER] Fallback to OpenWeatherMap successful`);
+        } catch (openWeatherError) {
+          console.error(`[WEATHER] OpenWeatherMap fallback failed:`, openWeatherError.message);
+          throw openMeteoError;
+        }
+      } else {
+        throw openMeteoError;
+      }
+    }
     
     res.json({
       location: {
@@ -220,11 +259,31 @@ export async function getHourlyForecast(req, res) {
       return res.status(400).json({ error: 'can cung cap city hoac lat/lon' });
     }
     
-    const hourlyForecast = await openMeteoService.getHourlyForecast(
-      parseFloat(lat),
-      parseFloat(lon),
-      parseInt(hours)
-    );
+    let hourlyForecast;
+    try {
+      hourlyForecast = await openMeteoService.getHourlyForecast(
+        parseFloat(lat),
+        parseFloat(lon),
+        parseInt(hours)
+      );
+    } catch (openMeteoError) {
+      if (openMeteoError.message?.includes('rate limit') || openMeteoError.message?.includes('429')) {
+        console.log(`[WEATHER] Open-Meteo rate limit, falling back to OpenWeatherMap`);
+        try {
+          hourlyForecast = await openweathermapService.getHourlyForecast(
+            parseFloat(lat),
+            parseFloat(lon),
+            parseInt(hours)
+          );
+          console.log(`[WEATHER] Fallback to OpenWeatherMap successful`);
+        } catch (openWeatherError) {
+          console.error(`[WEATHER] OpenWeatherMap fallback failed:`, openWeatherError.message);
+          throw openMeteoError;
+        }
+      } else {
+        throw openMeteoError;
+      }
+    }
     
     res.json({
       location: { city, lat: parseFloat(lat), lon: parseFloat(lon) },
